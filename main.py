@@ -7,6 +7,16 @@ from datetime import datetime
 import os
 
 def get_float_input(prompt, decimals=2):
+    """
+    Get a float input from the user with error handling.
+    
+    Args:
+    prompt (str): The prompt to display to the user.
+    decimals (int): The number of decimal places to round to.
+    
+    Returns:
+    float: The user's input as a float, rounded to the specified number of decimal places.
+    """
     while True:
         try:
             value = input(prompt).replace(',', '')
@@ -15,6 +25,15 @@ def get_float_input(prompt, decimals=2):
             print("Please enter a valid number.")
 
 def get_int_input(prompt):
+    """
+    Get an integer input from the user with error handling.
+    
+    Args:
+    prompt (str): The prompt to display to the user.
+    
+    Returns:
+    int: The user's input as an integer.
+    """
     while True:
         try:
             value = input(prompt).replace(',', '')
@@ -23,9 +42,25 @@ def get_int_input(prompt):
             print("Please enter a valid integer.")
 
 def calculate_percentage(state_amount, us_amount):
+    """
+    Calculate the percentage of a state amount relative to the US amount.
+    
+    Args:
+    state_amount (float): The amount for a specific state.
+    us_amount (float): The total US amount.
+    
+    Returns:
+    float: The calculated percentage, rounded to 2 decimal places.
+    """
     return round((state_amount / us_amount) * 100, 2) if us_amount != 0 else 0
 
 def collect_data():
+    """
+    Collect prediction market data from user input.
+    
+    Returns:
+    dict: A dictionary containing the collected data.
+    """
     data = {}
     data['Date'] = datetime.now().strftime('%Y-%m-%d')
     data['US Repbl. Odds'] = get_float_input("Enter US Republican Odds: ")
@@ -49,6 +84,16 @@ def collect_data():
     return data
 
 def append_to_parquet(data, filename):
+    """
+    Append new data to an existing Parquet file or create a new one if it doesn't exist.
+    
+    Args:
+    data (dict): The data to append.
+    filename (str): The name of the Parquet file.
+    
+    Returns:
+    pandas.DataFrame or None: The updated DataFrame if successful, None if cancelled.
+    """
     df = pd.DataFrame([data])
     
     try:
@@ -67,6 +112,12 @@ def append_to_parquet(data, filename):
     return df
 
 def visualize_data(df):
+    """
+    Visualize a selected column of data over time.
+    
+    Args:
+    df (pandas.DataFrame): The DataFrame containing the data to visualize.
+    """
     print("\nAvailable columns for visualization:")
     for i, col in enumerate(df.columns):
         print(f"{i}: {col}")
@@ -92,12 +143,27 @@ def visualize_data(df):
         print("Invalid choice. No visualization created.")
 
 def load_existing_data(filename):
+    """
+    Load data from an existing Parquet file.
+    
+    Args:
+    filename (str): The name of the Parquet file to load.
+    
+    Returns:
+    pandas.DataFrame: The loaded DataFrame, or an empty DataFrame if the file doesn't exist.
+    """
     try:
         return pd.read_parquet(filename)
     except FileNotFoundError:
         return pd.DataFrame()
 
 def list_parquet_files():
+    """
+    List all Parquet files in the current directory and let the user choose one.
+    
+    Returns:
+    str or None: The name of the chosen Parquet file, or None if no files are found.
+    """
     parquet_files = [f for f in os.listdir() if f.endswith('.parquet')]
     if not parquet_files:
         print("No .parquet files found in the current directory.")
@@ -118,6 +184,9 @@ def list_parquet_files():
             print("Please enter a valid number.")
 
 def main():
+    """
+    Main function to run the Prediction Market Election 2024 Data Collection program.
+    """
     print("--- Starting Prediction Market Election 2024 Data Collection ---")
     
     filename = list_parquet_files()

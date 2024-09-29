@@ -42,7 +42,7 @@ This project is designed to collect, store, and visualize data related to the 20
 Run the main script:
 
 ```
-python prediction_mkt_election_2024.py
+python main.py
 ```
 
 Follow the prompts to:
