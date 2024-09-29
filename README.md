@@ -65,6 +65,16 @@ Follow the prompts to:
   - Russell 2000 (IWM) price
   - Bitcoin (BTCUSDT) price
 
+## Data Conversion
+
+The project includes a `convert_parquet_to_csv.py` script for converting Parquet files to CSV format:
+
+1. Run the script: `python convert_parquet_to_csv.py`
+2. Choose a Parquet file from the list
+3. The script will create a CSV file in the same directory
+
+This tool facilitates data analysis in spreadsheet applications or other CSV-compatible tools.
+
 ## Dependencies
 
 Main dependencies include:
