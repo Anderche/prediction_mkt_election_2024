@@ -4,6 +4,12 @@ import glob
 import sys
 
 def list_parquet_files():
+    """
+    List all .parquet files in the current directory.
+    
+    Returns:
+    list: A list of .parquet filenames, or None if no files are found.
+    """
     parquet_files = glob.glob('*.parquet')
     if not parquet_files:
         print("No .parquet files found in the current directory.")
@@ -15,6 +21,15 @@ def list_parquet_files():
     return parquet_files
 
 def convert_parquet_to_csv(input_file):
+    """
+    Convert a .parquet file to .csv format.
+    
+    Args:
+    input_file (str): The name of the input .parquet file.
+    
+    Returns:
+    bool: True if conversion is successful, False otherwise.
+    """
     print(f"Starting conversion of {input_file}")
     
     # Get the base filename without extension
@@ -39,12 +54,14 @@ def convert_parquet_to_csv(input_file):
         return False
 
 if __name__ == "__main__":
+    # List available .parquet files
     parquet_files = list_parquet_files()
     
     if not parquet_files:
         print("No .parquet files found. Exiting the program.")
         sys.exit(1)
     
+    # Get user input for file selection
     while True:
         try:
             index = int(input("Enter the index of the file you want to convert: "))
@@ -56,6 +73,7 @@ if __name__ == "__main__":
         except ValueError:
             print("Invalid input. Please enter a number.")
     
+    # Convert the selected file
     convert_parquet_to_csv(file_name)
     
     print("Operation completed. Exiting the program.")
