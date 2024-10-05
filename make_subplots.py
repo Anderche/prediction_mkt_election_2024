@@ -103,13 +103,25 @@ def plot_features(df):
                 ax.grid(True, linestyle='--', alpha=0.7)
                 ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
                 
-                # Set background color based on column name
+                # Set background color and y-axis limits based on column name
                 if column.endswith('Total Amount') or column.endswith('Total Amt.'):
                     ax.set_facecolor('#e6ffe6')  # Light green
                 elif column.endswith('Odds'):
                     ax.set_facecolor('#e6f3ff')  # Light blue
                     ax.axhline(y=50, color='red', linestyle='--', linewidth=2)
-                    ax.set_ylim(bottom=40, top=100)
+                    
+                    # Calculate y-axis limits for 'Odds' features
+                    y_min = df[column].min()
+                    y_max = df[column].max()
+                    
+                    if y_max > 50:
+                        new_y_min = max(40, y_min - 5)
+                        new_y_max = min(100, y_max + 5)
+                    else:
+                        new_y_min = max(0, y_min - 5)
+                        new_y_max = min(60, y_max + 5)
+                    
+                    ax.set_ylim(bottom=new_y_min, top=new_y_max)
                 else:
                     y_min, y_max = ax.get_ylim()
                     ax.set_ylim(bottom=min(y_min, 0), top=max(y_max, 0) * 1.1)
@@ -122,11 +134,11 @@ def plot_features(df):
                 percent_change = (change / avg_last_3) * 100 if avg_last_3 != 0 else np.inf
 
                 # Create text box content
-                textstr = f'Current: {current_value:.2f}\nChange: {change:.2f}\nChange %: {percent_change:.2f}%'
+                textstr = f'Current: {current_value:.2f}\nChange: {change:.2f}\nChange % (3 vals): {percent_change:.2f}%'
                 
                 # Add text box to the plot
                 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-                ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=10,
+                ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=12,
                         verticalalignment='top', bbox=props)
             
             # Remove any unused subplots

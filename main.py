@@ -5,6 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from datetime import datetime
 import os
+import math
 
 def get_float_input(prompt, decimals=2):
     """
@@ -127,7 +128,18 @@ def visualize_data(df):
     if 0 <= choice < len(df.columns):
         column = df.columns[choice]
         plt.figure(figsize=(12, 6))
-        sns.lineplot(x='Date', y=column, data=df)
+        
+        # Check if the column is an 'Odds' feature
+        if column.endswith('Odds'):
+            min_value = df[column].min()
+            max_value = df[column].max()
+            y_min = max(0, min_value * 0.9)  # 10% below the lowest value, but not less than 0
+            y_max = min(100, max_value * 1.1)  # 10% above the highest value, but not more than 100
+            sns.lineplot(x='Date', y=column, data=df)
+            plt.ylim(bottom=y_min, top=y_max)
+        else:
+            sns.lineplot(x='Date', y=column, data=df)
+        
         plt.title(f"{column} Over Time")
         plt.xticks(rotation=45)
         plt.tight_layout()
