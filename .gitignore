@@ -3,6 +3,7 @@
 # Image files
 *.jpg
 *.jpeg
+*.pdf
 *.png
 *.gif
 *.bmp
