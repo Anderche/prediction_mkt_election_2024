@@ -56,6 +56,15 @@ def calculate_percentage(state_amount, us_amount):
     """
     return round((state_amount / us_amount) * 100, 2) if us_amount != 0 else 0
 
+def extract_party_data(content, party):
+    pattern = rf"{party}\s*\n\s*\$([\d,]+)\s*Vol\.\s*\n\s*([\d.]+)%"
+    match = re.search(pattern, content, re.IGNORECASE)
+    if match:
+        volume = match.group(1).replace(',', '')
+        percentage = match.group(2)
+        return (party, int(volume), float(percentage))
+    return None
+
 async def scrape_polymarket(url, crawler):
     print(f"\n🔍 Scraping data from: {url}")
     try:
@@ -67,23 +76,16 @@ async def scrape_polymarket(url, crawler):
         if result.success:
             content = result.markdown
             
-            # Check if it's the US-wide election URL
-            if url == "https://polymarket.com/event/presidential-election-winner-2024":
-                volume_match = re.search(r'\$([0-9,]+) Vol\.', content)
-                total_volume = float(volume_match.group(1).replace(',', '')) if volume_match else 0.0
-                
-                trump_match = re.search(r'Donald Trump\s+(\d+\.\d+)%', content)
-                trump_percentage = float(trump_match.group(1)) if trump_match else 0.0
-                
-                return total_volume, trump_percentage
+            republican_data = extract_party_data(content, "Republican")
+            democratic_data = extract_party_data(content, "Democrat")
+            
+            if republican_data and democratic_data:
+                total_amount = republican_data[1] + democratic_data[1]
+                republican_odds = republican_data[2]
+                return total_amount, republican_odds
             else:
-                volume_match = re.search(r'\$([0-9,]+) Vol\.', content)
-                total_volume = float(volume_match.group(1).replace(',', '')) if volume_match else 0.0
-                
-                republican_match = re.search(r'Republican.*?\n([0-9.]+)%', content, re.DOTALL)
-                republican_percentage = float(republican_match.group(1)) if republican_match else 0.0
-                
-                return total_volume, republican_percentage
+                print(f"Failed to extract data from: {url}")
+                return None, None
         else:
             print(f"Failed to scrape data from: {url}")
             return None, None
@@ -108,57 +110,118 @@ def get_financial_data():
     
     return data
 
+async def scrape_usa_data_polymarket(url, crawler):
+    try:
+        result = await crawler.arun(
+            url=url,
+            bypass_cache=True
+        )
+
+        if result.success:
+            content = result.markdown
+            
+            # Extract total volume
+            volume_match = re.search(r'\$([0-9,]+) Vol\.', content)
+            total_volume = int(volume_match.group(1).replace(',', '')) if volume_match else None
+            
+            # Extract Donald Trump's percentage
+            trump_match = re.search(r'Donald Trump\s+(\d+\.\d+)%', content)
+            trump_percentage = float(trump_match.group(1)) if trump_match else None
+            
+            return total_volume, trump_percentage
+        else:
+            print(f"Failed to scrape data from: {url}")
+            return None, None
+    except Exception as e:
+        print(f"Error scraping {url}: {str(e)}")
+        return None, None
+
+async def collect_us_data(crawler):
+    print("\n🔍 Collecting US election data...")
+    us_data = {}
+    us_url = "https://polymarket.com/event/presidential-election-winner-2024"
+
+    try:
+        total_amount, republican_odds = await scrape_usa_data_polymarket(us_url, crawler)
+        
+        if total_amount is not None and republican_odds is not None:
+            us_data['Date'] = datetime.now().strftime('%Y-%m-%d')
+            us_data['US Repbl. Odds'] = republican_odds
+            us_data['US Total Amt.'] = total_amount
+            print(f"📊 US Data: Republican Odds: {republican_odds}%, Total Amount: ${total_amount:,.2f}")
+        else:
+            print("⚠️ Warning: Failed to collect complete US data")
+    except Exception as e:
+        print(f"❌ Error collecting US data: {str(e)}")
+        print("Please check the URL and ensure the website structure hasn't changed.")
+
+    if len(us_data) <= 1:  # Only 'Date' key is present
+        print("\n❌ No US data was collected. Please check the issues above and try again.")
+        return None
+
+    print("\n✅ US data collection complete!")
+    return us_data
+
 async def collect_data():
-    """
-    Collect prediction market data from Polymarket and financial data from Yahoo Finance.
-    
-    Returns:
-    dict: A dictionary containing the collected data.
-    """
     print("\n= = = = = 🚀 Starting data collection process = = = = =")
     data = {}
-    data['Date'] = datetime.now().strftime('%Y-%m-%d')
-
-    urls = {
-        "US": "https://polymarket.com/event/presidential-election-winner-2024",
-        "Georgia": "https://polymarket.com/event/georgia-presidential-election-winner",
-        "Arizona": "https://polymarket.com/event/arizona-presidential-election-winner",
-        "Wisconsin": "https://polymarket.com/event/wisconsin-presidential-election-winner",
-        "Pennsylvania": "https://polymarket.com/event/pennsylvania-presidential-election-winner",
-        "North Carolina": "https://polymarket.com/event/north-carolina-presidential-election-winner",
-        "Nevada": "https://polymarket.com/event/nevada-presidential-election-winner",
-        "Michigan": "https://polymarket.com/event/michigan-presidential-election-winner"
-    }
 
     async with AsyncWebCrawler(verbose=True) as crawler:
+        # Collect US data first
+        us_data = await collect_us_data(crawler)
+        if us_data is None:
+            return None
+        data.update(us_data)
+
+        # Collect data for other states
+        urls = {
+            "Georgia": "https://polymarket.com/event/georgia-presidential-election-winner",
+            "Arizona": "https://polymarket.com/event/arizona-presidential-election-winner",
+            "Wisconsin": "https://polymarket.com/event/wisconsin-presidential-election-winner",
+            "Pennsylvania": "https://polymarket.com/event/pennsylvania-presidential-election-winner",
+            "North Carolina": "https://polymarket.com/event/north-carolina-presidential-election-winner",
+            "Nevada": "https://polymarket.com/event/nevada-presidential-election-winner",
+            "Michigan": "https://polymarket.com/event/michigan-presidential-election-winner"
+        }
+
         for state, url in urls.items():
-            total_amount, republican_odds = await scrape_polymarket(url, crawler)
-            
-            if state == "US":
-                data['US Repbl. Odds'] = republican_odds
-                data['US Total Amount'] = total_amount
-                print(f"📊 US Data: Republican Odds: {republican_odds}%, Total Amount: ${total_amount:,.2f}")
-            else:
-                data[f"{state} Repbl. Odds"] = republican_odds
-                data[f"{state} Total Amt."] = total_amount
-                data[f"{state} % of total"] = round((total_amount / data['US Total Amount']) * 100, 2) if data['US Total Amount'] != 0 else 0
-                print(f"📊 {state} Data: Republican Odds: {republican_odds}%, Total Amount: ${total_amount:,.2f}, % of Total: {data[f'{state} % of total']}%")
+            try:
+                total_amount, republican_odds = await scrape_polymarket(url, crawler)
+                
+                if total_amount is not None and republican_odds is not None:
+                    data[f"{state} Repbl. Odds"] = republican_odds
+                    data[f"{state} Total Amt."] = total_amount
+                    data[f"{state} % of total"] = calculate_percentage(total_amount, data['US Total Amt.'])
+                    print(f"📊 {state} Data: Republican Odds: {republican_odds}%, Total Amount: ${total_amount:,.2f}, % of US Total: {data[f'{state} % of total']}%")
+                else:
+                    print(f"⚠️ Warning: Failed to collect complete data for {state}")
+            except Exception as e:
+                print(f"❌ Error collecting data for {state}: {str(e)}")
+                print("Please check the URL and ensure the website structure hasn't changed.")
 
-    financial_data = get_financial_data()
-    data['SPX price'] = financial_data['^GSPC']
-    data['IWM price'] = financial_data['IWM']
-    data['BTCUSDT price'] = financial_data['BTC-USD']
+    try:
+        financial_data = get_financial_data()
+        data['SPX price'] = financial_data['^GSPC']
+        data['IWM price'] = financial_data['IWM']
+        data['BTCUSDT price'] = financial_data['BTC-USD']
 
-    print("\n💹 Financial Data:")
-    print(f"S&P 500: ${data['SPX price']:,.2f}")
-    print(f"Russell 2000: ${data['IWM price']:,.2f}")
-    print(f"Bitcoin: ${data['BTCUSDT price']:,.2f}")
+        print("\n💹 Financial Data:")
+        print(f"S&P 500: ${data['SPX price']:,.2f}")
+        print(f"Russell 2000: ${data['IWM price']:,.2f}")
+        print(f"Bitcoin: ${data['BTCUSDT price']:,.2f}")
+    except Exception as e:
+        print(f"❌ Error collecting financial data: {str(e)}")
+        print("Please check your internet connection and try again.")
+
+    if len(data) <= 1:  # Only 'Date' key is present
+        print("\n❌ No data was collected. Please check the issues above and try again.")
+        return None
 
     print("\n✅ Data collection complete!")
     return data
 
 def append_to_parquet(data, filename):
-    print(f"\n💾 Appending data to {filename}...")
+    print(f"\n💾 Preparing to append data to {filename}...")
     """
     Append new data to an existing Parquet file or create a new one if it doesn't exist.
     
@@ -171,6 +234,10 @@ def append_to_parquet(data, filename):
     """
     df = pd.DataFrame([data])
     
+    # Round float64 columns to 2 decimal places
+    float_columns = df.select_dtypes(include=['float64']).columns
+    df[float_columns] = df[float_columns].round(2)
+    
     try:
         existing_df = pd.read_parquet(filename)
         
@@ -179,11 +246,30 @@ def append_to_parquet(data, filename):
             print(f"An entry for {data['Date']} already exists. Cancelling operation.")
             return None
         
+        # Round float64 columns in existing_df to 2 decimal places
+        existing_float_columns = existing_df.select_dtypes(include=['float64']).columns
+        existing_df[existing_float_columns] = existing_df[existing_float_columns].round(2)
+        
         df = pd.concat([existing_df, df], ignore_index=True)
     except FileNotFoundError:
         pass
 
+    # Display the data to be appended
+    print("\nNew data to be appended:")
+    for key, value in data.items():
+        if isinstance(value, float):
+            print(f"  {key}: {value:.2f}")
+        else:
+            print(f"  {key}: {value}")
+
+    # Ask for confirmation
+    confirm = input("\nDo you want to save this data? (yes/no): ").lower()
+    if confirm != 'yes':
+        print("Operation cancelled. Data not saved.")
+        return None
+
     df.to_parquet(filename, engine='pyarrow')
+    print(f"✅ Data successfully appended to {filename}")
     return df
 
 def visualize_data(df):
@@ -224,6 +310,21 @@ def visualize_data(df):
             filename = f"{column.replace(' ', '_')}_visualization.png"
             plt.savefig(filename)
             print(f"Image saved as {filename}")
+    
+        # Ask for confirmation to save the .parquet file
+        save_parquet = input("Do you want to save the updated .parquet file? (yes/no): ").lower()
+        if save_parquet == 'yes':
+            current_date = datetime.now().strftime('%d%b%Y').upper()
+            parquet_filename = f"DATA_prediction_levels_{current_date}.parquet"
+            print(f"The file will be saved as: {parquet_filename}")
+            confirm_save = input("Do you want to proceed with saving? (yes/no): ").lower()
+            if confirm_save == 'yes':
+                df.to_parquet(parquet_filename, engine='pyarrow')
+                print(f"✅ Data successfully saved to {parquet_filename}")
+            else:
+                print("❌ .parquet file not saved.")
+        else:
+            print("❌ .parquet file not saved.")
         
         plt.show()
     else:
@@ -309,7 +410,11 @@ async def main():
     print("\n🔄 Initiating data collection...")
     data = await collect_data()
     
-    print("\n📥 Appending to Parquet File...")
+    if data is None:
+        print("❌ Data collection failed. Please address the issues and try again.")
+        return
+
+    print("\n📥 Preparing to append data to Parquet File...")
     df = append_to_parquet(data, filename)
     
     if df is not None:
@@ -318,12 +423,17 @@ async def main():
         for i, entry in enumerate(last_three, 1):
             print(f"\nEntry {i}:")
             for key, value in entry.items():
-                print(f"  {key}: {value}")
+                if isinstance(value, float):
+                    print(f"  {key}: {value:.2f}")
+                else:
+                    print(f"  {key}: {value}")
 
         print("\n📈 Data Visualization")
         visualize = input("Would you like to visualize the data? (yes/no): ").lower()
         if visualize == 'yes':
             visualize_data(df)
+    else:
+        print("\n❌ Data was not saved. Skipping visualization.")
     
     print("\n= = = = = 🎉 Program Finished! ... the Prediction Market Election 2024 Data Collection and Analysis Complete = = = = =")
 
