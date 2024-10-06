@@ -1,19 +1,23 @@
 # Prediction Market Election 2024 Data Collection
 
-This project is designed to collect, store, and visualize data related to the 2024 US Presidential Election prediction markets. It focuses on tracking Republican odds, total amounts, and market percentages for key swing states, as well as relevant financial market indicators.
+Built by: Anders Kiss
 
---- 
+This project is designed to collect, store, and analyze data related to the 2024 US Presidential Election prediction markets. It focuses on tracking Republican odds, total amounts, and market percentages for key swing states, as well as relevant financial market indicators.
+
+---
 
 ## Created by: Anders Kiss
-## Date: September 2024 
+## Date: September 2024
 
---- 
+---
 
 ## Features
 
-- Data collection for US-wide and state-specific prediction market odds and amounts
-- Automatic calculation of state percentages relative to the total US market
+- Automated data collection from multiple sources:
+  - US-wide and state-specific prediction market odds and amounts
+  - Financial market indicators
 - Storage of data in Parquet format for efficient data management
+- Data processing and analysis capabilities
 - Visualization of historical data trends
 - Spot-checking of the most recent entries
 - Prevention of duplicate daily entries
@@ -39,24 +43,30 @@ This project is designed to collect, store, and visualize data related to the 20
 
 ## Usage
 
-Run the main script:
+The project consists of several scripts for different purposes:
+
+1. `main.py`: The main script for running the data collection and processing pipeline.
+2. `script_ALL_DATA_SCRAPE_DEMO.py`: Demonstrates scraping all required data.
+3. `script_demo_scrape_US_data.py`: Focuses on scraping US-specific data.
+4. `script_demo_scrape_polymarket.py`: Scrapes data from Polymarket.
+5. `script_demo_scrape_full_page.py`: Demonstrates scraping a full webpage.
+6. `script_remove_last_record_parquet.py`: Utility to remove the last record from a Parquet file.
+7. `script_demo_REMOVE_DEM_DATA.py`: Removes Democratic party data from the dataset.
+
+To run the main data collection pipeline:
 
 ```
 python main.py
 ```
 
-Follow the prompts to:
-1. Select an existing Parquet file or create a new one
-2. Input the latest prediction market data
-3. View the last few entries
-4. Visualize data trends
+For specific data scraping or processing tasks, run the corresponding script.
 
 ## Data Collected
 
 - Date of entry
 - US Republican odds
 - US total market amount
-- For each state (Georgia, Arizona, Wisconsin, Pennsylvania, North Carolina, Nevada, Michigan):
+- State-specific data for key swing states:
   - Republican odds
   - Total market amount
   - Percentage of total US market
@@ -65,15 +75,15 @@ Follow the prompts to:
   - Russell 2000 (IWM) price
   - Bitcoin (BTCUSDT) price
 
-## Data Conversion
+## Data Management
 
-The project includes a `convert_parquet_to_csv.py` script for converting Parquet files to CSV format:
+The project uses Parquet files for efficient data storage. To convert Parquet files to CSV format:
 
 1. Run the script: `python convert_parquet_to_csv.py`
 2. Choose a Parquet file from the list
 3. The script will create a CSV file in the same directory
 
-This tool facilitates data analysis in spreadsheet applications or other CSV-compatible tools.
+This facilitates data analysis in spreadsheet applications or other CSV-compatible tools.
 
 ## Dependencies
 
@@ -82,6 +92,8 @@ Main dependencies include:
 - pyarrow
 - seaborn
 - matplotlib
+- requests
+- beautifulsoup4
 
 For a full list of dependencies, see `requirements.txt`.
 
@@ -94,20 +106,3 @@ To create an environment from the exported file:
 ```
 conda env create -f environment.yml
 ```
-
-## Contributing
-
-Contributions to improve the project are welcome. Please follow these steps:
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/AmazingFeature`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-5. Push to the branch (`git push origin feature/AmazingFeature`)
-6. Open a Pull Request
-
-## Disclaimer
-
-This tool is for educational and research purposes only. It does not constitute financial advice or predictions. Always do your own research before making any investment decisions.
-
-
