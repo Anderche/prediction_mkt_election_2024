@@ -1,3 +1,9 @@
+"""
+Prediction Market Election 2024 Data Collection Tool
+
+This script collects and manages prediction market data for the 2024 US election, storing it in Parquet files and providing visualization capabilities.
+"""
+
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -25,23 +31,6 @@ def get_float_input(prompt, decimals=2):
         except ValueError:
             print("Please enter a valid number.")
 
-def get_int_input(prompt):
-    """
-    Get an integer input from the user with error handling.
-    
-    Args:
-    prompt (str): The prompt to display to the user.
-    
-    Returns:
-    int: The user's input as an integer.
-    """
-    while True:
-        try:
-            value = input(prompt).replace(',', '')
-            return int(value)
-        except ValueError:
-            print("Please enter a valid integer.")
-
 def calculate_percentage(state_amount, us_amount):
     """
     Calculate the percentage of a state amount relative to the US amount.
@@ -65,22 +54,22 @@ def collect_data():
     data = {}
     data['Date'] = datetime.now().strftime('%Y-%m-%d')
     data['US Repbl. Odds'] = get_float_input("Enter US Republican Odds: ")
-    data['US Total Amount'] = get_int_input("Enter US Total Amount: ")
+    data['US Total Amount'] = get_float_input("Enter US Total Amount: ")
 
     states = ['Georgia', 'Arizona', 'Wisconsin', 'Pennsylvania', 'North Carolina', 'Nevada', 'Michigan']
     
     for state in states:
         odds = get_float_input(f"Enter {state} Republican Odds: ")
-        total_amount = get_int_input(f"Enter {state} Total Amount: ")
+        total_amount = get_float_input(f"Enter {state} Total Amount: ")
         percentage = calculate_percentage(total_amount, data['US Total Amount'])
         
         data[f"{state} Repbl. Odds"] = odds
         data[f"{state} Total Amt."] = total_amount
         data[f"{state} % of total"] = percentage
 
-    data['SPX price'] = get_int_input("Enter SPX price: ")
-    data['IWM price'] = get_int_input("Enter IWM price: ")
-    data['BTCUSDT price'] = get_int_input("Enter BTCUSDT price: ")
+    data['SPX price'] = get_float_input("Enter SPX price: ")
+    data['IWM price'] = get_float_input("Enter IWM price: ")
+    data['BTCUSDT price'] = get_float_input("Enter BTCUSDT price: ")
 
     return data
 
@@ -123,7 +112,7 @@ def visualize_data(df):
     for i, col in enumerate(df.columns):
         print(f"{i}: {col}")
     
-    choice = get_int_input("Enter the number of the column you want to visualize: ")
+    choice = int(get_float_input("Enter the number of the column you want to visualize: "))
     
     if 0 <= choice < len(df.columns):
         column = df.columns[choice]
@@ -187,7 +176,7 @@ def list_parquet_files():
     
     while True:
         try:
-            choice = int(input("\nEnter the number of the file you want to use: "))
+            choice = int(get_float_input("\nEnter the number of the file you want to use: "))
             if 1 <= choice <= len(parquet_files):
                 return parquet_files[choice - 1]
             else:
@@ -251,6 +240,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
