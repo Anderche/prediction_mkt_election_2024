@@ -30,11 +30,22 @@ async def scrape_polymarket(url, crawler):
         return None
 
 async def main():
+
+    # urls = {
+    #     "Nevada": "https://polymarket.com/event/nevada-presidential-election-winner/will-a-democrat-win-nevada-presidential-election",
+    #     # Add more states and their corresponding URLs here
+    #     # "Florida": "https://polymarket.com/event/...",
+    #     # "Ohio": "https://polymarket.com/event/...",
+    # }
+
     urls = {
-        "Nevada": "https://polymarket.com/event/nevada-presidential-election-winner/will-a-democrat-win-nevada-presidential-election",
-        # Add more states and their corresponding URLs here
-        # "Florida": "https://polymarket.com/event/...",
-        # "Ohio": "https://polymarket.com/event/...",
+        "Georgia": "https://polymarket.com/event/georgia-presidential-election-winner",
+        "Arizona": "https://polymarket.com/event/arizona-presidential-election-winner",
+        "Wisconsin": "https://polymarket.com/event/wisconsin-presidential-election-winner",
+        "Pennsylvania": "https://polymarket.com/event/pennsylvania-presidential-election-winner",
+        "North Carolina": "https://polymarket.com/event/north-carolina-presidential-election-winner",
+        "Nevada": "https://polymarket.com/event/nevada-presidential-election-winner",
+        "Michigan": "https://polymarket.com/event/michigan-presidential-election-winner"
     }
 
     async with AsyncWebCrawler(verbose=True) as crawler:
