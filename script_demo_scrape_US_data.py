@@ -2,7 +2,7 @@ import asyncio
 import re
 from crawl4ai import AsyncWebCrawler
 
-async def scrape_polymarket(url, crawler):
+async def scrape_usa_data_polymarket(url, crawler):
     try:
         result = await crawler.arun(
             url=url,
@@ -37,7 +37,7 @@ async def main():
         results = {}
         for key, value in urls.items():
             print(f"\nScraping data for {key} from: {value}")
-            total_volume, trump_percentage = await scrape_polymarket(value, crawler)
+            total_volume, trump_percentage = await scrape_usa_data_polymarket(value, crawler)
             if total_volume and trump_percentage:
                 print(f"US Total Amount\t{total_volume}")
                 print(f"US Repbl. Odds\t{trump_percentage}")

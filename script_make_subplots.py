@@ -51,6 +51,8 @@ def profile_dataframe(df):
 
 def plot_features(df):
     numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns
+    # Remove columns ending with 'Dem. Odds' from the list of columns to plot
+    numeric_columns = [col for col in numeric_columns if not col.endswith('Dem. Odds')]
     n_cols = len(numeric_columns)
     
     if n_cols == 0:
@@ -64,7 +66,7 @@ def plot_features(df):
     default_filename = f"numeric_features_{datetime.now().strftime('%d%b%Y')}.pdf"
     
     # Ask user if they want to save the plot
-    save_plot = input(f"Do you want to save the plot? (y/n) [default filename: {default_filename}]: ").lower().strip()
+    save_plot = input(f"\nDo you want to save the plot to a .PDF file? (y/n) [default filename: {default_filename}]: ").lower().strip()
     if save_plot == 'y':
         filename = input(f"Enter the filename to save the plot (default: {default_filename}): ") or default_filename
         
