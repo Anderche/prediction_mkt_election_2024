@@ -31,13 +31,6 @@ async def scrape_polymarket(url, crawler):
 
 async def main():
 
-    # urls = {
-    #     "Nevada": "https://polymarket.com/event/nevada-presidential-election-winner/will-a-democrat-win-nevada-presidential-election",
-    #     # Add more states and their corresponding URLs here
-    #     # "Florida": "https://polymarket.com/event/...",
-    #     # "Ohio": "https://polymarket.com/event/...",
-    # }
-
     urls = {
         "Georgia": "https://polymarket.com/event/georgia-presidential-election-winner",
         "Arizona": "https://polymarket.com/event/arizona-presidential-election-winner",
