@@ -24,6 +24,8 @@ import asyncio
 import re
 from crawl4ai import AsyncWebCrawler
 import yfinance as yf
+import sys
+import numpy as np
 
 def get_float_input(prompt, decimals=2):
     """
@@ -124,11 +126,11 @@ async def scrape_usa_data_polymarket(url, crawler):
             volume_match = re.search(r'\$([0-9,]+) Vol\.', content)
             total_volume = int(volume_match.group(1).replace(',', '')) if volume_match else None
             
-            # Extract Donald Trump's percentage
+            # Extract Donald Trump's percentage (assuming this represents the Republican odds)
             trump_match = re.search(r'Donald Trump\s+(\d+\.\d+)%', content)
-            trump_percentage = float(trump_match.group(1)) if trump_match else None
+            republican_odds = float(trump_match.group(1)) if trump_match else None
             
-            return total_volume, trump_percentage
+            return total_volume, republican_odds
         else:
             print(f"Failed to scrape data from: {url}")
             return None, None
@@ -147,17 +149,25 @@ async def collect_us_data(crawler):
         if total_amount is not None and republican_odds is not None:
             us_data['Date'] = datetime.now().strftime('%Y-%m-%d')
             us_data['US Repbl. Odds'] = republican_odds
-            us_data['US Total Amt.'] = total_amount
+            us_data['US Total Amount'] = total_amount
             print(f"📊 US Data: Republican Odds: {republican_odds}%, Total Amount: ${total_amount:,.2f}")
         else:
             print("⚠️ Warning: Failed to collect complete US data")
+            sys.exit(1)  # Exit with error code 1
     except Exception as e:
         print(f"❌ Error collecting US data: {str(e)}")
         print("Please check the URL and ensure the website structure hasn't changed.")
+        sys.exit(1)  # Exit with error code 1
 
     if len(us_data) <= 1:  # Only 'Date' key is present
         print("\n❌ No US data was collected. Please check the issues above and try again.")
-        return None
+        sys.exit(1)  # Exit with error code 1
+
+    # Check for NaN values
+    for key, value in us_data.items():
+        if isinstance(value, (int, float)) and np.isnan(value):
+            print(f"❌ Error: NaN value detected for {key}")
+            sys.exit(1)  # Exit with error code 1
 
     print("\n✅ US data collection complete!")
     return us_data
@@ -191,7 +201,7 @@ async def collect_data():
                 if total_amount is not None and republican_odds is not None:
                     data[f"{state} Repbl. Odds"] = republican_odds
                     data[f"{state} Total Amt."] = total_amount
-                    data[f"{state} % of total"] = calculate_percentage(total_amount, data['US Total Amt.'])
+                    data[f"{state} % of total"] = calculate_percentage(total_amount, data['US Total Amount'])
                     print(f"📊 {state} Data: Republican Odds: {republican_odds}%, Total Amount: ${total_amount:,.2f}, % of US Total: {data[f'{state} % of total']}%")
                 else:
                     print(f"⚠️ Warning: Failed to collect complete data for {state}")
@@ -254,6 +264,19 @@ def append_to_parquet(data, filename):
     except FileNotFoundError:
         pass
 
+    # Check for NaN values in the entire DataFrame
+    nan_count = df.isna().sum().sum()
+    if nan_count > 0:
+        print(f"⚠️ Warning: {nan_count} NaN value(s) detected in the data")
+        print("Affected features:")
+        for column in df.columns[df.isna().any()]:
+            print(f"  - {column}: {df[column].isna().sum()} NaN value(s)")
+        
+        save_anyway = input("Do you want to save the data anyway? (yes/no): ").lower()
+        if save_anyway != 'yes':
+            print("Operation cancelled. Data not saved.")
+            return None
+
     # Display the data to be appended
     print("\nNew data to be appended:")
     for key, value in data.items():
@@ -268,8 +291,10 @@ def append_to_parquet(data, filename):
         print("Operation cancelled. Data not saved.")
         return None
 
-    df.to_parquet(filename, engine='pyarrow')
-    print(f"✅ Data successfully appended to {filename}")
+    current_date = datetime.now().strftime('%d%b%Y').upper()
+    new_filename = f"DATA_prediction_levels_{current_date}.parquet"
+    df.to_parquet(new_filename, engine='pyarrow')
+    print(f"✅ Data successfully saved to {new_filename}")
     return df
 
 def visualize_data(df):
