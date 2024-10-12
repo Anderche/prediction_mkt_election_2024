@@ -2,7 +2,11 @@
 
 Built by: Anders Kiss
 
-This project is designed to collect, store, and analyze data related to the 2024 US Presidential Election prediction markets. It focuses on tracking Republican odds, total amounts, and market percentages for key swing states, as well as relevant financial market indicators.
+This project is designed to collect, store, and analyze data related to the **2024 US Presidential Election** prediction markets. It focuses on tracking the odds for the two main parties, total USD amounts, and market percentages for key swing states, as well as relevant financial market indicators.
+
+**Key Swing States**
+
+- Arizona, Georgia, Michigan, Nevada, North Carolina, Pennsylvania, Wisconsin
 
 ---
 
