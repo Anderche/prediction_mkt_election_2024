@@ -1,5 +1,3 @@
-
-
 # Image files
 *.jpg
 *.jpeg
@@ -13,4 +11,6 @@
 *.svg
 *.webp
 
-
+# Parquet files
+*.parquet
+!*LATEST.parquet
