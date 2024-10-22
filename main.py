@@ -384,7 +384,10 @@ def list_parquet_files():
         print("No .parquet files found in the current directory.")
         return None
     
-    print("\nAvailable .parquet files:")
+    # Sort files by the ending date, most recent last
+    parquet_files.sort(key=lambda x: datetime.strptime(x.split('_')[-1].split('.')[0], '%d%b%Y'), reverse=True)
+    
+    print("\nAvailable .parquet files (most recent last):")
     for i, file in enumerate(parquet_files, 1):
         print(f"{i}: {file}")
     
