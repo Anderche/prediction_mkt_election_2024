@@ -14,3 +14,11 @@
 # Parquet files
 *.parquet
 !*LATEST.parquet
+
+# Helper script files
+*demo*.py
+*demo*.sh
+*remove*.py
+*remove*.sh
+*REMOVE*.py
+*REMOVE*.sh
