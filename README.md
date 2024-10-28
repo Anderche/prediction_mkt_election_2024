@@ -1,112 +1,114 @@
 # Prediction Market Election 2024 Data Collection
 
-Built by: Anders Kiss
 
-This project is designed to collect, store, and analyze data related to the **2024 US Presidential Election** prediction markets. It focuses on tracking the odds for the two main parties, total USD amounts, and market percentages for key swing states, as well as relevant financial market indicators.
-
-**Key Swing States**
-
-- Arizona, Georgia, Michigan, Nevada, North Carolina, Pennsylvania, Wisconsin
+### Author
+Built by: Anders Kiss (September 2024)
 
 ---
 
-## Created by: Anders Kiss
-## Date: September 2024
+## What are Prediction Markets?
+Prediction markets are trading platforms where people can bet real money on the outcome of future events - in this case, the 2024 US Presidential Election. These markets often provide more accurate forecasts than traditional polls because participants have a financial stake in being correct. When many people trade based on their best information, the market price becomes a probability estimate of an event occurring.
 
----
+## Project Overview
+This tool automatically collects and analyzes data from election prediction markets for the 2024 US Presidential Election. It tracks:
+- Betting odds for both major political parties
+- Total money being wagered
+- Market activity in key swing states
+- Related financial market indicators
 
-## Features
+**Key Swing States Monitored**
+These states often determine the election outcome due to their competitive nature:
+- Arizona
+- Georgia
+- Michigan
+- Nevada
+- North Carolina
+- Pennsylvania
+- Wisconsin
 
-- Automated data collection from multiple sources:
-  - US-wide and state-specific prediction market odds and amounts
-  - Financial market indicators
-- Storage of data in Parquet format for efficient data management
-- Data processing and analysis capabilities
-- Visualization of historical data trends
-- Spot-checking of the most recent entries
-- Prevention of duplicate daily entries
+## Technical Details
 
-## Installation
+### Features
+- Automated data collection from multiple prediction market sources
+- Efficient data storage using Parquet format (a high-performance file format)
+- Data analysis and visualization tools
+- Automated quality checks:
+  - Duplicate entry prevention
+  - Data validation
+  - Error logging
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/yourusername/prediction-market-election-2024.git
-   cd prediction-market-election-2024
-   ```
+### Data Collected Daily
+1. National-level metrics:
+   - Republican and Democratic odds
+   - Total betting volume (in USD)
+   
+2. State-level data for each swing state:
+   - Party-specific odds
+   - Betting volume
+   - Percentage of total national market
+   
+3. Financial market indicators:
+   - S&P 500 (SPX) - Major US stock market index
+   - Russell 2000 (IWM) - Small-cap US stocks index
+   - Bitcoin (BTCUSDT) - Leading cryptocurrency price
 
-2. Create a Conda environment:
-   ```
-   conda create --name prediction_market python=3.9
-   conda activate prediction_market
-   ```
+## Setup Instructions
 
-3. Install the required packages:
-   ```
-   conda install --file requirements.txt
-   ```
-
-## Usage
-
-The project consists of several scripts for different purposes:
-
-1. `main.py`: The main script for running the data collection and processing pipeline.
-2. `script_ALL_DATA_SCRAPE_DEMO.py`: Demonstrates scraping all required data.
-3. `script_demo_scrape_US_data.py`: Focuses on scraping US-specific data.
-4. `script_demo_scrape_polymarket.py`: Scrapes data from Polymarket.
-5. `script_demo_scrape_full_page.py`: Demonstrates scraping a full webpage.
-6. `script_remove_last_record_parquet.py`: Utility to remove the last record from a Parquet file.
-7. `script_demo_REMOVE_DEM_DATA.py`: Removes Democratic party data from the dataset.
-
-To run the main data collection pipeline:
-
+### 1. Installation
+First, clone this repository:
+```bash
+git clone https://github.com/yourusername/prediction-market-election-2024.git
+cd prediction-market-election-2024
 ```
+
+### 2. Environment Setup
+We use Conda for managing dependencies. If you don't have Conda, download it from [Anaconda's website](https://www.anaconda.com/products/distribution).
+
+Create and activate the environment:
+```bash
+conda create --name prediction_market python=3.9
+conda activate prediction_market
+conda install --file requirements.txt
+```
+
+### 3. Running the Project
+The main script handles all data collection:
+```bash
 python main.py
 ```
 
-For specific data scraping or processing tasks, run the corresponding script.
-
-## Data Collected
-
-- Date of entry
-- US Republican odds
-- US total market amount
-- State-specific data for key swing states:
-  - Republican odds
-  - Total market amount
-  - Percentage of total US market
-- Financial indicators:
-  - S&P 500 (SPX) price
-  - Russell 2000 (IWM) price
-  - Bitcoin (BTCUSDT) price
+### Additional Tools
+Several utility scripts are available:
+- `script_ALL_DATA_SCRAPE_DEMO.py`: Full data collection demonstration
+- `script_demo_scrape_US_data.py`: US-specific data collection
+- `script_demo_scrape_polymarket.py`: Polymarket-specific scraper
+- `script_remove_last_record_parquet.py`: Data correction tool
+- `convert_parquet_to_csv.py`: Convert data to spreadsheet format
 
 ## Data Management
+Data is stored in Parquet format, which provides:
+- Efficient storage (smaller file sizes)
+- Fast read/write operations
+- Strong data type preservation
 
-The project uses Parquet files for efficient data storage. To convert Parquet files to CSV format:
-
-1. Run the script: `python convert_parquet_to_csv.py`
-2. Choose a Parquet file from the list
-3. The script will create a CSV file in the same directory
-
-This facilitates data analysis in spreadsheet applications or other CSV-compatible tools.
+To convert data to CSV for spreadsheet analysis:
+1. Run: `python convert_parquet_to_csv.py`
+2. Select your target Parquet file
+3. Find the CSV output in the same folder
 
 ## Dependencies
+Core packages:
+- pandas: Data manipulation
+- pyarrow: Parquet file handling
+- seaborn/matplotlib: Data visualization
+- requests/beautifulsoup4: Web scraping
 
-Main dependencies include:
-- pandas
-- pyarrow
-- seaborn
-- matplotlib
-- requests
-- beautifulsoup4
-
-For a full list of dependencies, see `requirements.txt`.
-
-To export the current environment (for reproducibility):
-```
+For reproducibility:
+```bash
+# Export environment
 conda env export > environment.yml
-```
 
-To create an environment from the exported file:
-```
+# Create environment from file
 conda env create -f environment.yml
 ```
+
