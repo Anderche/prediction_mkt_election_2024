@@ -1,6 +1,5 @@
 # Prediction Market Election 2024 Data Collection
 
-
 ### Author
 Built by: Anders Kiss (September 2024)
 
@@ -19,10 +18,12 @@ This tool automatically collects and analyzes data from election prediction mark
 ## Example Data Visualization
 Below are examples of the prediction market odds tracking for both Pennsylvania and overall US Republican chances in the 2024 election:
 
-![Pennsylvania Republican Odds](./assets/pa_republican_odds.png)
+<img src="assets/pa_republican_odds.png" alt="Pennsylvania Republican Odds" width="600"/>
+
 *Pennsylvania Republican betting odds over time, showing current value of 61.00 with a 0.55% change*
 
-![US Republican Odds](./assets/us_republican_odds.png)
+<img src="assets/us_republican_odds.png" alt="US Republican Odds" width="600"/>
+
 *US Republican betting odds over time, showing current value of 65.10 with a 2.30% change*
 
 These visualizations demonstrate the daily tracking of betting odds, with the red dashed line representing the 50% threshold. Values above this line indicate the market favors a Republican win in that race.
@@ -69,7 +70,7 @@ Create and activate the environment:
 ```bash
 conda create --name prediction_market python=3.9
 conda activate prediction_market
-conda install --file requirements.txt
+pip install -r requirements.txt
 ```
 
 ### 3. Running the Project
@@ -112,4 +113,3 @@ conda env export > environment.yml
 # Create environment from file
 conda env create -f environment.yml
 ```
-

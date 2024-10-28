@@ -3,6 +3,8 @@
 *.jpeg
 *.pdf
 *.png
+!assets/pa_republican_odds.png
+!assets/us_republican_odds.png
 *.gif
 *.bmp
 *.tiff
