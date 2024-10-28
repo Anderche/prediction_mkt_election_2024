@@ -16,15 +16,16 @@ This tool automatically collects and analyzes data from election prediction mark
 - Market activity in key swing states
 - Related financial market indicators
 
-**Key Swing States Monitored**
-These states often determine the election outcome due to their competitive nature:
-- Arizona
-- Georgia
-- Michigan
-- Nevada
-- North Carolina
-- Pennsylvania
-- Wisconsin
+## Example Data Visualization
+Below are examples of the prediction market odds tracking for both Pennsylvania and overall US Republican chances in the 2024 election:
+
+![Pennsylvania Republican Odds](./assets/pa_republican_odds.png)
+*Pennsylvania Republican betting odds over time, showing current value of 61.00 with a 0.55% change*
+
+![US Republican Odds](./assets/us_republican_odds.png)
+*US Republican betting odds over time, showing current value of 65.10 with a 2.30% change*
+
+These visualizations demonstrate the daily tracking of betting odds, with the red dashed line representing the 50% threshold. Values above this line indicate the market favors a Republican win in that race.
 
 ## Technical Details
 
