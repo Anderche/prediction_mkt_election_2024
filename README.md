@@ -1,4 +1,4 @@
-# Prediction Market Election 2024 Data Collection
+# Scraping Polymarket | Prediction Market Tool | U.S. Presidential Election 2024 
 
 ### Author
 Built by: Anders Kiss (September 2024)
@@ -6,7 +6,7 @@ Built by: Anders Kiss (September 2024)
 ---
 
 ## What are Prediction Markets?
-Prediction markets are trading platforms where people can bet real money on the outcome of future events - in this case, the 2024 US Presidential Election. These markets often provide more accurate forecasts than traditional polls because participants have a financial stake in being correct. When many people trade based on their best information, the market price becomes a probability estimate of an event occurring.
+Prediction markets are trading platforms where people can bet real money on the outcome of future events - in this case, the 2024 US Presidential Election. This application scrapes the website, [Polymarket](https://polymarket.com/), for market odds. These markets often provide more accurate forecasts than traditional polls because participants have a financial stake in being correct. When many people trade based on their best information, the market price becomes a probability estimate of an event occurring.
 
 ## Project Overview
 This tool automatically collects and analyzes data from election prediction markets for the 2024 US Presidential Election. It tracks:
