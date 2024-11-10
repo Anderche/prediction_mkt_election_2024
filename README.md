@@ -1,9 +1,8 @@
 # Scraping Polymarket | Prediction Market Tool | U.S. Presidential Election 2024 | Electoral & State
 
 ### Developed By:
-Anders Kiss 
 
-_September 2024_
+Anders Kiss 
 
 ---
 
